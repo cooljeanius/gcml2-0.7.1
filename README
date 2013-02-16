@@ -1,0 +1,158 @@
+
+Found bugs with CML2 formal language spec
+-----------------------------------------
+
+1.  Spec says that a symbol is:
+
+<symbol>      ::= [A-Z][A-Z0-9_]*
+
+  but the following symbols in kernel-symbols.txt break that rule
+by containing a lowercase letter:
+
+WD80x3
+CS89x0
+MVME16x
+MVME16x_SCSI
+MAC89x0
+MVME16x_NET
+  --> ESR fixed by removing all lexical distinction between symbols
+      and menus.
+
+
+2.  Base64-data is in general indistinguishable from symbols
+    and menus...context sensitive.
+    --> ESR accepted that it's context sensitive, I implemented it thus.
+    
+3.  Semantics of inclusion searchpaths for `source' undefined.
+    --> ESR convinced to make them cpp-like (includer-relative).
+
+4.  Spec says the argument to `banner' is a <string> but in fact
+    it's a <menu> (which is a good thing).
+    --> ESR fixed in spec
+    
+5.  The `options' statement seems pointless for alernate implementations.
+    Yet its semantics must be useful, so why aren't there better ways
+    to specify output formats?
+    --> lots of argument, ESR may remove entirely
+    
+6.  Spec says ``Declaring all symbols up front means we can do better
+    and faster sanity checks''.  However not all symbols are in
+    fact declared up front, e.g. the symbol SPARC is not declared in
+    `symbols' and is then used in several rules before the rule
+    which `derive's it from `SPARC32 or SPARC64'.
+    --> gnb modified parser to do forward-referencing of derived
+        symbols, with 2nd pass to do fixup checks.
+    
+    
+------
+
+  Check that expressions like  FOO==n  where FOO is *boolean* are
+supposed to work.
+
+
+TODO:  do compile-time type propagation to set types of derived symbols
+
+TODO: what is a neat way to handle a string or hex symbol with a limited
+      range of values??  e.g.
+      
+      `MSND Classic IRQ 5, 7, 8, 10, 11, 12'
+      --> ESR extended `default...range' syntax to have multiple
+          discrete subranges, which handles this case well.
+	  
+      `SC-6600 CDROM interface (4=None, 3=IDE, 1=Panasonic, 0=?Sony?)'
+      --> this one appears to be unique.  A patch has been submitted
+          to AC to change it in CML1 to use standard `choice'.
+      
+      A verification expression?  Some technique derived from `choices' ?
+      
+
+TODO: need to handle a `filename' type attribute.
+
+TODO: what is a neat way to generate lists of object files for
+    $(OBJS) and $(M_OBJS) ???
+    
+--------
+
+TODO: enforce this!!!
+It is a compile-time error to apply the logical operators
+or/and/implies to trit or numeric values.  Also, expressions occuring
+in guards (in unless/suppress, whenever/set, or require/prohibit
+declarations) must yield a value of boolean type. The compiler does
+type propagation in expressions to check these constraints.
+
+TODO: the following are rules containing expressions which break
+the rule
+     * IV.3.18 Expressions
+     * [...]
+     * It is a compile-time error to apply the logical operators
+     * or/and/implies to trit or numeric values.  [...] The compiler does
+     * type propagation in expressions to check these constraints.
+
+
+CML2 parser error: kernel-rules.cml:383 operands to `and' must be boolean; use (VAR==y) for tristate variables.
+CML2 parser error: kernel-rules.cml:754 operands to `and' must be boolean; use (VAR==y) for tristate variables.
+CML2 parser error: kernel-rules.cml:787 operands to `and' must be boolean; use (VAR==y) for tristate variables.
+CML2 parser error: kernel-rules.cml:787 operands to `and' must be boolean; use (VAR==y) for tristate variables.
+CML2 parser error: kernel-rules.cml:906 operands to `and' must be boolean; use (VAR==y) for tristate variables.
+CML2 parser error: kernel-rules.cml:1220 operands to `and' must be boolean; use (VAR==y) for tristate variables.
+CML2 parser error: kernel-rules.cml:1220 operands to `and' must be boolean; use (VAR==y) for tristate variables.
+CML2 parser error: kernel-rules.cml:1322 operands to `or' must be boolean; use (VAR==y) for tristate variables.
+CML2 parser error: kernel-rules.cml:1562 operands to `or' must be boolean; use (VAR==y) for tristate variables.
+CML2 parser error: kernel-rules.cml:1674 operands to `and' must be boolean; use (VAR==y) for tristate variables.
+CML2 parser error: kernel-rules.cml:1694 operands to `and' must be boolean; use (VAR==y) for tristate variables.
+CML2 parser error: kernel-rules.cml:1742 operands to `or' must be boolean; use (VAR==y) for tristate variables.
+CML2 parser error: kernel-rules.cml:2038 operands to `and' must be boolean; use (VAR==y) for tristate variables.
+CML2 parser error: kernel-rules.cml:2044 operands to `and' must be boolean; use (VAR==y) for tristate variables.
+CML2 parser error: kernel-rules.cml:2049 operands to `or' must be boolean; use (VAR==y) for tristate variables.
+CML2 parser error: kernel-rules.cml:2049 operands to `or' must be boolean; use (VAR==y) for tristate variables.
+CML2 parser error: kernel-rules.cml:2152 operands to `and' must be boolean; use (VAR==y) for tristate variables.
+CML2 parser error: kernel-rules.cml:2158 operands to `and' must be boolean; use (VAR==y) for tristate variables.
+
+  Some of these are like this:
+derive BINFMT_ELF32 from SPARC_BINFMT_ELF32 or MIPS_BINFMT_ELF32
+
+where both SPARC_BINFMT_ELF32 and MIPS_BINFMT_ELF32 are trit.  Should
+this be rewritten using a trinary operator?
+
+  Also, these are error message from require, prohibit or visibility rules
+whose expressions are not of boolean type.  
+
+CML2 parser error: kernel-rules.cml:613 expression in visibility rule must be boolean.
+CML2 parser error: kernel-rules.cml:1009 expression in visibility rule must be boolean.
+CML2 parser error: kernel-rules.cml:1085 expression in visibility rule must be boolean.
+CML2 parser error: kernel-rules.cml:1085 expression in visibility rule must be boolean.
+CML2 parser error: kernel-rules.cml:1089 expression in visibility rule must be boolean.
+CML2 parser error: kernel-rules.cml:1089 expression in visibility rule must be boolean.
+CML2 parser error: kernel-rules.cml:1561 expression in visibility rule must be boolean.
+CML2 parser error: kernel-rules.cml:1561 expression in visibility rule must be boolean.
+CML2 parser error: kernel-rules.cml:1561 expression in visibility rule must be boolean.
+CML2 parser error: kernel-rules.cml:1561 expression in visibility rule must be boolean.
+CML2 parser error: kernel-rules.cml:1623 expression in visibility rule must be boolean.
+CML2 parser error: kernel-rules.cml:1625 expression in visibility rule must be boolean.
+CML2 parser error: kernel-rules.cml:1675 expression in visibility rule must be boolean.
+CML2 parser error: kernel-rules.cml:1704 expression in visibility rule must be boolean.
+CML2 parser error: kernel-rules.cml:2416 expression in visibility rule must be b
+--> ESR has found his bug and will presumably fix these errors in kernel-rules.cml
+
+--------
+
+TODO: add check that `choices' must have at least one choice mentioned!!
+
+TODO: remove lexical difference between symbols & menus
+
+TODO: oooops, hex & dec are supposed to be signed!!! ??
+
+
+TODO: ESR's 0.7.6 kernel-rules.cml has screwed up my parser because
+      he now allows forward references to symbols which are not `derived'd
+      but normal symbols in the menu tree.  Specifically, CARDBUS.
+      The result is that it's treetype is falsely assigned MN_DERIVED
+      which prevents the `?' suffix being interpreted correctly.  So
+      it's value.type becomes A_NONE and things go horribly awry when
+      it's used in a visibility rule.  Or *something* like that.
+
+---------
+
+Hmm,  Video4Linux ....?
+
+

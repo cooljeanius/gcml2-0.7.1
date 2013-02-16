@@ -1,0 +1,90 @@
+#
+# Trivial case: no subranges
+#
+delete
+count
+check 0
+check 1
+check 2
+#
+# Single rubrange covering a single number
+#
+delete
+add 5 5
+count
+check 4
+check 5
+check 6
+#
+# Single subrange covering several numbers
+#
+delete
+add 4 6
+count
+check 3
+check 4
+check 5
+check 6
+check 7
+#
+# Multiple subranges, added disjointly
+#
+delete
+add 2 4
+add 7 9
+count
+check 1
+check 2
+check 3
+check 4
+check 5
+check 6
+check 7
+check 8
+check 9
+check 10
+#
+# range_add() workout
+#
+# extending last subrange
+delete
+add 1 1
+add 2 2
+add 3 6
+# extending body subrange trivially
+delete
+add 2 4
+add 10 15
+add 5 5
+# extending body subrange nontrivially
+delete
+add 2 4
+add 10 15
+add 5 8
+# merging adjacent body subranges over trivial gap
+delete
+add 2 4
+add 6 8
+add 5 5
+# merging adjacent body subranges over nontrivial gap
+delete
+add 2 4
+add 8 10
+add 5 7
+# merging multiple body subranges
+delete
+add 2 4
+add 8 10
+add 13 17
+add 3 16
+# merging multiple body subranges again
+delete
+add 2 4
+add 8 10
+add 13 17
+add 25 32
+add 64 127
+add 2 127
+
+
+

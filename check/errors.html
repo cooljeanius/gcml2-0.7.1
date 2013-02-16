@@ -1,0 +1,120 @@
+<dl>
+
+<a name="undeclared-symbol">
+<dt><b>undeclared-symbol</b>
+<dd>
+A symbol was used in an expression but never declared.  This error only
+appears in merge mode; in single mode it appears
+as a warning and the symbol is given an empty default value.  Undeclared
+symbols result in dead branches which can never be activated.  The usual
+causes are typographical errors and relics left after code changes.
+For example,
+
+<pre class="example">
+if [ "<b>$CONFIG_405</b>" = "y" ]; then
+   ...
+fi
+</pre>
+
+<a name="unbalanced-endmenu">
+<dt><b>unbalanced-endmenu</b>
+<dd>
+A rules file contains an extraneous <span class="keyword">endmenu</span>
+which matches no open <span class="keyword">mainmenu_option</span>.
+
+<pre class="example">
+# arch/mips64/config.in
+mainmenu_option next_comment
+comment 'General setup'
+...
+endmenu
+
+source drivers/pci/Config.in
+
+<b>endmenu</b>
+</pre>
+
+
+<a name="not-a-hex-number">
+<dt><b>not-a-hex-number</b>
+<dd>
+The word provided as a default value for a <span class="keyword">hex</span>
+statement could not be parsed as a hexadecimal number.  This is not a real
+example:
+
+<pre class="example">
+hex 'This has never happened' CONFIG_NONESUCH <b>fmeh</b>
+</pre>
+
+
+<a name="parse-error">
+<dt><b>parse-error</b>
+<dd>
+This is a catch-all error emitted by the bison parser when it encounters
+unexpected tokens in the CML1 file.  These are usually caused by people
+thinking that the config language is the same as a shell script, and
+writing rules containing shell metacharacters which aren't part of the
+config language.
+
+<p class="emphasis">
+The config language is not shell.
+</p>
+
+<p>
+Generally, these constructs will work in <span class="code">config</span> and
+<span class="code">menuconfig</span> but fail in <span class="code">xconfig</span>
+because <span class="code">xconfig</span> does not use the shell as a parser.
+Sometimes however, they will work in <span class="code">xconfig</span> too as
+<span class="code">xconfig</span> sometimes ignores trailing tokens on a line.
+For example,
+</p>
+
+<pre class="example">
+if [ "$CONFIG_IA64_SGI_SN1" = "y" <b>] || [</b> "$CONFIG_IA64_SGI_SN2" = "y" ]; then
+	...
+fi
+</pre>
+
+<a name="missing-file">
+<dt><b>missing-file</b>
+<dd>
+A CML1 filename was included with the <span class="keyword">source</span>
+statement but the file could not be opened.  Usually this is the result
+of an arch tree being only partly merged into the mainline kernel.  For
+example,
+
+<pre class="example">
+if [ "$CONFIG_SH_DREAMCAST" = "y" ]; then
+   source <b>drivers/maple/Config.in</b>
+fi
+</pre>
+
+
+<a name="different-compound-type">
+<dt><b>different-compound-type</b>
+<dd>
+A compound node (menu, <span class="keyword">choice</span> or
+<span class="keyword">comment</span> statement) uses the same banner as
+another compound node of a different type.  This confuses the parser,
+which tries to merge the two nodes.  Note that
+<span class="keyword">comment</span> statements are considered compound 
+because of CML2, where comments were implemented as childless menus.
+Sometimes this error indicates a harmless duplication of comments.
+For example,
+
+<pre class="example">
+# net/ax25/Config.in
+<b>mainmenu_option</b> next_comment
+comment <b>'AX.25 network device drivers'</b>
+
+source drivers/net/hamradio/Config.in
+
+endmenu
+
+# drivers/net/hamradio/Config.in
+<b>comment 'AX.25 network device drivers'</b>
+
+</pre>
+
+
+</dl>

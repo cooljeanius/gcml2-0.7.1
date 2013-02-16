@@ -1,0 +1,96 @@
+--- OPEN ---
+
+	* Language spec update: `default' clause in `choices' is optional.
+	* Language spec update: menu concatenation
+	* Language spec update: suppressed derived symbols are not written
+	  to the defconfig file.
+	* Language spec update: exact rules for how symbols are written
+	  to the defconfig file, and format for unset trits.
+	* Language spec update: detect loops in default expressions
+	* Language spec update: detect loops in derivations
+	* Detect loops in dependencies
+	* Language spec update: integral symbols defaulted from logical
+	  symbols get 0 (n) or 1 (y,m).  Logical symbols defaulted from
+	  integral symbols get n (0) or y (!= 0).
+	* Language spec update: `prefix' must precede symbol declarations.
+	* For some stupid reason, I have misnamed ternary expressions
+	  `trinary' in the code.  Fool.
+	* Exit code compatibility with reference.
+        * Implementing symbol freezing semantics properly
+	* Reorg atom type to have a basic type bitfield, which matches
+	  1-to-1 with the union branch.  Then `is_comparable' is easier.
+	* CRITICAL: Condition "trits".
+	* CRITICAL: Commandline compatibility with reference.
+	* Condition "nohelp".
+	* Colourising nodes according to state.
+	* Option to make suppressed nodes insensitive instead of invisible.
+	* A Find function for textual search of node names and banners.
+	* A GUI for exploring interrelations of rules and nodes, e.g.
+	  what visibility rules affect this node.  Link rules and nodes
+	  back to their definitions in the rulebase source.
+	* Convert the node help to HTML on the fly, in particular
+	  inserting hyperlinks to documents.
+	* Add a menu item to re-read the rulebase.
+	* I18N.
+	* Remove glib requirement for curses, linemode front ends.
+	* Remove libglade requirement for GTK front end.
+        * Build an RPM
+        * Convert to using autoconf/automake
+        * Lots more testing
+    	* Menuconfig presents NEW symbols as having a value, n for
+    	  tristates and booleans, but will not save them to the config
+    	  file because their actual value is null.  This is confusing
+    	  to the user.
+    	* Rename the save function ...save_config not ...save_defconfig.
+	* Debug->Profile.  Implement a menu item which, if compiled with
+	  -pg, turns on profiling, runs a long gui & data structure test
+	  simulating a user doing the sequence {load a file, set all
+	  the visible symbols to a random value in depth-first order,
+	  save the file} N times, then save gprof data.  Use this to
+	  find bottlenecks to get an idea of how fast the rulebase is.
+	* Common sub-expression elimination.  Implement CSEE: each
+	  expression node to be unique, with a unique naming algorithm
+	  giving keys to a global hashtable.  Each node created
+	  during parsing is unique.  Dirty bit and value caching.
+	  Bi-directional uses/usedby relationships, to evaluate (uses)
+	  & propagate dirty (usedby).  Did it; performance improvement
+	  not worth the complexity as the rulebase is not queried
+	  enough times.
+    	* Bug?  in trees-1.cml, visibility expressions don't seem to
+    	  suppress down the subtree except for a single level.
+	* Language spec update: added property-name-declaration ::=
+	  <symbol>* 'alias' symbol sets up aliases for the *property*
+	* Language spec update: added property-declaration ::= 'give'
+	  <symbol>* 'property' <symbol> declares that the LHS symbols
+	  have the RHS property
+	* Language spec update: removed explanations-declaration
+	* Language spec update: rule helptext has third branch "K_LIKE
+	  SYMBOL" added to reuse helptext from another symbol.
+	* Language spec update: symbols_declararation now uses the
+	  "menus" keyword.
+	* Language spec update: name_or_subtree can have a label-prefix
+	* Language spec update: properties are saved in the defconfig
+	  file in magical comments
+	* Language spec update: Quote: "The compilers does not make
+	  symbols [...] connected by any logical expression operator
+	  other than conjunction into ancestors of symbols on the
+	  right-hand side [of an unless...suppress rule]"
+
+
+--- CLOSED ---
+
+	* Language spec update: only save format is defconfig
+	* Language spec update: `condition' statement may take a constant.
+	* Delayed binding.  Instead of evaluating default expressions and
+	  derivation expressions in one big pass (with a topological sort
+	  to get the order right), attach the expression directly to the
+	  symbol and evaluate it when the symbol's value is requested.
+	* Language-spec update: remove private-declaration
+	* Language-spec update: added saveability rule ::= {'unless'|'when'} <logical> 'expose' <symbol>*
+	* Language-spec update: rename radio_definition -> choices_definition
+	* Language-spec update: The filename argument to the "source" keyword
+	  can now be unquoted also, i.e. both of these work
+	  source foo.cml
+	  source "foo.cml"
+	* Language-spec update: visibility_rule has alternate leadin keyword
+	  "when" which presumably inverts the logic from "unless".

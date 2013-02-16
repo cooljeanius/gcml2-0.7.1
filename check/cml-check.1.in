@@ -1,0 +1,124 @@
+.\"
+.\"  gcml2 -- an implementation of Eric Raymond's CML2 in C
+.\"  Copyright (C) 2000-2002 Greg Banks
+.\"
+.\"  This library is free software; you can redistribute it and/or
+.\"  modify it under the terms of the GNU Library General Public
+.\"  License as published by the Free Software Foundation; either
+.\"  version 2 of the License, or (at your option) any later version.
+.\"
+.\"  This library is distributed in the hope that it will be useful,
+.\"  but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\"  Library General Public License for more details.
+.\"
+.\"  You should have received a copy of the GNU Library General Public
+.\"  License along with this library; if not, write to the Free
+.\"  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+.\"
+.TH CML-CHECK "1" "August 2002" "GCML2" "GCML2 Manual Pages"
+.\"
+.\"
+.SH NAME
+cml\-check \- Linux kernel configuration rulebase checker
+.\"
+.\"
+.SH SYNOPSIS
+\fBcml\-check\fR [\fIOPTION\fR]... \fIconfig.in\fR
+.br
+\fBcml\-check\fR [\fIOPTION\fR]... \fIconfig.in\fR \fIconfig.in\fR...
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+\fBcml\-check\fR is a correctness checker for the Linux kernel's
+configuration rulebase language, variously known as CML1 or just
+"config language".  It uses the same CML1 parser backend as the other
+GCML2 programs, but emits errors and warnings instead instead of interacting
+with the user.  Used in conjunction with \fBcml\-summarise\fR it can
+provide a concise summary of the health of a Linux source tree's rules corpus.
+.PP
+\fBcml\-check\fR operates in one of two modes, single mode and merge mode.
+In single mode, \fBcml\-check\fR reads a tree of config files rooted at
+a single \fIconfig.in\fR file.  In merge mode, \fBcml\-check\fR reads a
+number of potentially overlapping trees of config files, each rooted at
+a separate \fIconfig.in\fR file, and internally merges them into a single
+tree.  This mode is useful for detecting problems which cannot be seen
+without a global view of all arch trees, e.g. symbols not defined in any
+arch tree.  Merge mode is entered automatically when more than one filename
+is given on the command line, as in the second synopsis.  Merge mode affects
+the behaviour of the parser in various ways, e.g. the default set of
+enabled warnings.
+.PP
+The \fBcml\-check\fR interface is deliberately designed to
+be comfortable to \fBgcc\fR users.  Warnings are enabled with
+\fB-W\fIwhatever\fR and disabled with \fB-Wno-\fIwhatever\fR.
+Output is a set of error and warning lines designed to look as much
+as possible like \fBgcc\fR messages.  This allows \fBcml\-check\fR
+to be conveniently used with tools designed to parse the output of
+\fBmake\fR runs, such as \fBmaketool\fR and \fBemacs\fR's \fIM-x compile\fR
+command.
+.PP
+All other options are standard GNU long form and those that take arguments
+may be used both with and without an = sign, for example \fB\-\-arch 386\fR
+or \fB\-\-arch=386\fR.
+.TP
+\fB\-\-help\fR
+display a summary of usage and exit.
+.TP
+\fB\-\-arch\fR \fIarch\fR
+Specify the value of the \fI$ARCH\fR variable used during parsing.
+This no longer has much practical effect.
+.TP
+\fB\-\-xref\fR \fIfilename\fR
+Specify a filename to which config symbol cross-reference information
+will be written.  The file will contain a sequence of records, one per
+text line, describing the location and type of each definition or use
+of a config symbol in the CML1 corpus.
+.TP
+\fB\-\-W\fIwarning\-name\fR
+Enable the warning named \fIwarning\-name\fR.
+.TP
+\fB\-\-Wno-\fIwarning\-name\fR
+Disable the warning named \fIwarning\-name\fR.
+.TP
+\fB\-\-Wall\fR
+Enable all warnings, even those not useful in \fBcml\-check\fR's current
+mode.
+.TP
+\fB\-\-Wno-all\fR
+Disable all warnings.
+.\"
+.\"
+.SH WARNINGS
+.PP
+The following warnings are reported by \fBcml\-check\fR.  The headings
+are warning names emitted by the \fBcml\-summarize\fR program and can
+be used with the \fB\-W\fR option.  Unless otherwise noted, the examples
+are real CML1 rules taken from the Linux 2.5 series.
+.\" @INSERT_WARNINGS_MAN@
+.\"
+.\"
+.SH ERRORS
+.PP
+The following errors are reported by \fBcml\-check\fR.
+Note that the names used as headings below are not used in any
+\fBcml\-check\fR options but do correspond to the names emitted by the
+\fBcml\-summarize\fR script.
+.\" @INSERT_ERRORS_MAN@
+.\"
+.\"
+.SH "REPORTING BUGS"
+Report bugs to <gnb@alphalink.com.au>.
+.\"
+.\"
+.SH "SEE ALSO"
+.BR cml\-summarize (1),
+.BR cml\-check\-all (1).
+.\"
+.\"
+.SH COPYRIGHT
+Copyright \(co 2000-2002 Greg Banks.
+.br
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

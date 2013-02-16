@@ -1,0 +1,525 @@
+<dl>
+
+<a name="missing-experimental-tag">
+<dt><b>missing-experimental-tag</b>
+<dd>
+A symbol depends on <span class="code">CONFIG_EXPERIMENTAL</span> but does
+not tell the user in it's banner using the <span class="code">(EXPERIMENTAL)</span>
+tag.  This is confusing to the user, who expects the tag to correspond to
+reality.  The large number of these is due to whole menu subtrees being
+sourced inside <span class="code">if [ "$CONFIG_EXPERIMENTAL" = "y" ]</span>.
+For example,
+
+<pre class="example">
+if [ "$CONFIG_EXPERIMENTAL" = "y" ]; then  
+   tristate 'SGI Newport Graphics support' CONFIG_SGI_NEWPORT_GFX
+fi
+</pre>
+
+        
+<a name="spurious-experimental-tag">
+<dt><b>spurious-experimental-tag</b>
+<dd>
+A symbol's banner contains the <span class="code">(EXPERIMENTAL)</span> tag,
+telling the user that it depends on
+<span class="code">CONFIG_EXPERIMENTAL</span>, but it doesn't depend on
+<span class="code">CONFIG_EXPERIMENTAL</span>.  This is confusing to
+the user.  For example,
+
+<pre class="example">
+tristate 'Ext3 journalling file system support <b>(EXPERIMENTAL)</b>' CONFIG_EXT3_FS
+</pre>
+
+
+<a name="variant-experimental-tag">
+<dt><b>variant-experimental-tag</b>
+<dd>
+A variant form of the <span class="code">(EXPERIMENTAL)</span> tag was
+used in a symbol's banner.  Currently recognised variant forms are:
+    <ul>
+    	<li><span class="code">(experimental)</span>
+	<li><span class="code">(Experimental)</span>
+	<li><span class="code">(DANGEROUS)</span>
+    </ul>    
+This is confusing to the user.  For example,
+
+<pre class="example">
+dep_tristate 'SMC IrCC <b>(Experimental)</b>' CONFIG_SMC_IRCC_FIR $CONFIG_IRDA
+</pre>
+
+
+<a name="inconsistent-experimental-tag">
+<dt><b>inconsistent-experimental-tag</b>
+<dd>
+A symbol is defined in two locations. or is included from two locations,
+one of which depends on <span class="code">CONFIG_EXPERIMENTAL</span> and
+one of which doesn't.  This makes it impossible to decide whether to put
+an <span class="code">(EXPERIMENTAL)</span> tag in the banner or not.
+Note that despite the name, the check is based on the actual condition and
+dependencies of the definitions, and the tag is ignored.  For example,
+
+<pre class="example">
+if [ "$CONFIG_ATARI" = "y" ]; then
+   ...
+   tristate '  ATI Mach64 display support' CONFIG_FB_ATY
+   ...
+fi
+...
+if [ "$CONFIG_EXPERIMENTAL" = "y" ]; then
+   if [ "$CONFIG_PCI" != "n" ]; then
+      ...
+      tristate '  ATI Mach64 display support (EXPERIMENTAL)' CONFIG_FB_ATY
+      ...
+   fi
+fi
+</pre>
+
+
+<a name="missing-obsolete-tag">
+<dt><b>missing-obsolete-tag</b>
+<dd>
+A symbol depends on <span class="code">CONFIG_OBSOLETE</span> but does not
+say tell the user in it's banner using the <span class="code">(OBSOLETE)</span>
+tag.  Interestingly, <span class="code">CONFIG_OBSOLETE</span> itself is never
+defined.  This is confusing to the user.  For example,
+
+<pre class="example">
+if [ "$CONFIG_OBSOLETE" = "y" ]; then
+   tristate '    FMV-181/182/183/184 support' CONFIG_FMV18X
+fi
+</pre>
+
+
+<a name="spurious-obsolete-tag">
+<dt><b>spurious-obsolete-tag</b>
+<dd>
+A symbol's banner contains the <span class="code">(OBSOLETE)</span> tag,
+telling the user that it depends on <span class="code">CONFIG_OBSOLETE</span>,
+but it doesn't depend on <span class="code">CONFIG_OBSOLETE</span>.
+This is confusing to the user.  For example,
+
+<pre class="example">
+if [ "$CONFIG_EXPERIMENTAL" = "y" ]; then
+  tristate 'Kernel support for JAVA binaries <b>(obsolete)</b>' CONFIG_BINFMT_JAVA
+fi
+</pre>
+
+
+<a name="variant-obsolete-tag">
+<dt><b>variant-obsolete-tag</b>
+<dd>
+A variant form of the <span class="code">(OBSOLETE)</span> tag was
+used in a symbol's banner.  Currently recognised variant forms are:
+    <ul>
+    	<li><span class="code">(obsolete)</span>
+	<li><span class="code">[Obsolete]</span>
+    </ul>    
+
+<pre class="example">
+if [ "$CONFIG_EXPERIMENTAL" = "y" ]; then
+  tristate 'Kernel support for JAVA binaries <b>(obsolete)</b>' CONFIG_BINFMT_JAVA
+fi
+</pre>
+
+
+<a name="inconsistent-obsolete-tag">
+<dt><b>inconsistent-obsolete-tag</b>
+<dd>
+A symbol is defined in two locations. or is included from two locations,
+one of which depends on <span class="code">CONFIG_OBSOLETE</span> and
+one of which doesn't.  This makes it impossible to decide whether to put
+an <span class="code">(OBSOLETE)</span> tag in the banner or not.
+Note that despite the name, the check is based on the actual condition and
+dependencies of the definitions, and the tag is ignored.  See
+<a href="inconsistent-experimental-tag">inconsistent-experimental-tag</a>
+for an example.
+
+
+<a name="spurious-dependencies">
+<dt><b>spurious-dependencies</b>
+<dd>
+Symbol references or tristate constants appearing after
+the last valid argument in a <span class="keyword">bool</span> or
+<span class="keyword">tristate</span> statement,
+either because someone thought they were using
+<span class="keyword">dep_bool</span>
+or because they thought that <span class="keyword">bool</span> takes
+a default value argument like <span class="keyword">hex</span> and
+<span class="keyword">string</span>.  For example,
+
+<pre class="example">
+bool 'PCI support' CONFIG_PCI <b>y</b>
+...
+bool '  USR Sportster internal TA' CONFIG_HISAX_SPORTSTER <b>$CONFIG_ISA</b>
+</pre>
+
+
+<a name="default-not-in-choices">
+<dt><b>default-not-in-choices</b>
+<dd>
+The default sub-prompt specified for a <span class="keyword">choice</span>
+statement was not one of the sub-prompts listed earlier in the same
+statement.  For example,
+
+<pre class="example">
+choice 'Cerf Flash available'  \
+     "8MB    CONFIG_SA1100_CERF_FLASH_8MB \
+      16MB   CONFIG_SA1100_CERF_FLASH_16MB \
+      32MB   CONFIG_SA1100_CERF_FLASH_32MB" <b>CerfFlash</b>
+</pre>
+
+<a name="empty-choices">
+<dt><b>empty-choices</b>
+<dd>
+A <span class="keyword">choice</span> statement contained no sub-prompts.
+This is not a real example:
+
+<pre class="example">
+choice 'Not a real example'  \
+     "foo    " foo
+</pre>
+
+
+<a name="nonliteral-define">
+<dt><b>nonliteral-define</b>
+<dd>
+A <span class="keyword">define</span> statement defines a symbol to an
+expression which is more than just a literal value like "y" or "n".  This
+is not actually part of the config language, but has crept in
+because it works for some configurators.  For example,
+
+<pre class="example">
+define_bool CONFIG_JBD <b>$CONFIG_EXT3_FS</b>
+</pre>
+
+
+<a name="unset-statement">
+<dt><b>unset-statement</b>
+<dd>
+The <span class="keyword">unset</span> statement was used.  There may be
+nothing inherently wrong with that statement, I just haven't entirely
+figured out why people have used it and how to check it for problems.
+
+
+<a name="different-banner">
+<dt><b>different-banner</b>
+<dd>
+A symbol was defined multiple times in different arch trees
+or in different branches of <span class="keyword">if</span> statements
+with different banner strings.  A very small number of these could
+arguably be justified; the vast majority are just trivial textual
+differences which don't affect meaning.  Such cases make harder the job
+of merging architecture-dependent rules.  For example,
+
+<pre class="example">
+# arch/mips/config.in
+bool 'Support non-SCSI/IDE/ATAPI <b>CDROM</b> drives' CONFIG_CD_NO_IDESCSI
+
+# arch/alpha/config.in
+bool 'Support non-SCSI/IDE/ATAPI drives' CONFIG_CD_NO_IDESCSI
+</pre>
+
+
+<a name="different-parent">
+<dt><b>different-parent</b>
+<dd>
+A symbol was defined multiple times in different arch trees
+or in different branches of <span class="keyword">if</span> statements
+in a different menu.  Usually this is because a symbol is being
+defined in one menu and queried in another.  Such constructs generally
+work fine in <span class="code">config</span> and sometimes in
+<span class="code">menuconfig</span> but lead to strange presentation
+problems in <span class="code">xconfig</span>.  This warning also
+catches genuine mistakes, for example:
+
+<pre class="example">
+# arch/ia64/config.in
+mainmenu_option next_comment
+comment 'Processor type and features'
+...
+bool '    Enable DEVFS Debug Code' <b>CONFIG_DEVFS_DEBUG</b> n
+
+# fs/Config.in
+mainmenu_option next_comment
+comment 'File systems'
+...
+dep_bool '  Debug devfs' <b>CONFIG_DEVFS_DEBUG</b> $CONFIG_DEVFS_FS
+</pre>
+
+
+<a name="overlapping-definitions">
+<dt><b>overlapping-definitions</b>
+<dd>
+A symbol was defined multiple times in different branches of
+<span class="keyword">if</span> statements where there exist combinations
+of symbol settings which result in two of these branches being
+visible at the same time.  This causes presentation problems in all
+three configurators.  The warning also includes the trivial case
+of a symbol defined twice.  For example,
+
+<pre class="example">
+if [ "$CONFIG_DEBUG_KERNEL" != "n" ]; then
+   ...
+   bool '  Spinlock debugging' <b>CONFIG_DEBUG_SPINLOCK</b>
+   ...
+   bool '  Spinlock debugging' <b>CONFIG_DEBUG_SPINLOCK</b>
+fi
+</pre>
+
+<a name="overlapping-mixed-definitions">
+<dt><b>overlapping-mixed-definitions</b>
+<dd>
+Like the <a href="#overlapping-definitions">overlapping-definitions</a>
+warning, but the symbol is defined as a query (e.g.
+<span class="keyword">bool</span>) in one branch and a define
+(e.g. <span class="keyword">define_bool</span>) in another.
+Depending on a number of factors, this can cause symptoms ranging
+from presentation problems to inconsistent configs, in all three
+configurators.  This warning is usually more serious than the plain
+<a href="#overlapping-definitions">overlapping-definitions</a> warning.
+For example,
+
+<pre class="example">
+bool 'Support non-SCSI/IDE/ATAPI CDROM drives' <b>CONFIG_CD_NO_IDESCSI</b>
+...
+if [ "$CONFIG_VIOCD" = "y" ]; then
+   define_bool <b>CONFIG_CD_NO_IDESCSI</b> y
+fi
+</pre>
+
+
+<a name="primitive-in-root">
+<dt><b>primitive-in-root</b>
+<dd>
+A query symbol, rather than a sub-menu, was present in the root menu.  This
+breaks <span class="code">xconfig</span>.  For example,
+
+<pre class="example">
+# arch/mips/config.in
+source drivers/pci/Config.in
+
+# drivers/pci/Config.in
+if [ "$CONFIG_PCI" = "y" ]; then
+   <b>bool</b> 'PCI device name database' CONFIG_PCI_NAMES
+fi
+</pre>
+
+
+
+<a name="undeclared-symbol">
+<dt><b>undeclared-symbol</b>
+<dd>
+A symbol was used in an expression but never declared and the symbol is
+given an empty default value.  Note that in merge mode this warning
+becomes an error.  In single mode the usual culprit is a symbol defined
+only in another arch tree; use merge mode to find symbols not declared in
+any architecture.  For example,
+
+<pre class="example">
+if [ "<b>$CONFIG_405</b>" = "y" ]; then
+   ...
+fi
+</pre>
+
+
+<a name="forward-compared-to-n">
+<dt><b>forward-compared-to-n</b>
+<dd>
+A symbol was used in an <span class="keyword">if</span> statement
+of the form <span class="code">if [ "$CONFIG_FOO" != "n" ]</span>, 
+where CONFIG_FOO has not been defined with a query or a
+<span class="keyword">define_*</span> statement.  This can be
+because the symbol is defined in another arch tree, or is defined
+after this use (see <a href="#forward-reference">forward-reference</a>),
+or is never defined (see <a href="#undeclared-symbol">undeclared-symbol</a>).
+Under some circumstances (e.g. <span class="code">make allyesconfig</span>) the
+symbol will have an empty value at this point and the comparison will
+not do what the rules author thought it did.  For example,
+
+<pre class="example">
+# arch/mips/config.in
+source drivers/parport/Config.in
+
+if [ "$CONFIG_DECSTATION" = "y" ]; then
+   ...
+   tristate 'Standard/generic (dumb) serial support' CONFIG_SERIAL
+   ...
+fi
+
+# drivers/parport/Config.in
+   if [ "$CONFIG_PARPORT_PC" != "n" -a <b>"$CONFIG_SERIAL" != "n"</b> ]; then
+      ...
+</pre>
+
+
+<a name="symbol-arch">
+<dt><b>symbol-arch</b>
+<dd>
+The undocumented symbol <span class="code">$ARCH</span> was used in a rule.
+This symbol, along with all the user's environment variables, is available
+to the shell-based configurators <span class="code">config</span> and
+<span class="code">menuconfig</span> and happens to work in
+<span class="code">xconfig</span>, but is not a documented part of
+the config language.  For example,
+
+<pre class="example">
+if [ <b>"$ARCH"</b> = "alpha" ]; then
+   define_bool CONFIG_OSF_PARTITION y
+fi
+</pre>
+
+
+<a name="forward-reference">
+<dt><b>forward-reference</b>
+<dd>
+A symbol was used (for example, in a condition or a dependency for a
+<span class="keyword">dep_bool</span>) before it was declared.  Note that
+this warning does not count symbols used but never declared (see
+<a href="#undeclared-symbol">undeclared-symbol</a>).  This
+indicates poor menu design which uses a symbol before it is declared
+elsewhere in the menu structure, thus making life difficult for users of
+<span class="code">make config</span> and
+<span class="code">make allyesconfig</span>.  For example,
+	
+<pre class="example">
+mainmenu_option next_comment
+comment 'Power management options (ACPI, APM)'
+...
+if [ "<b>$CONFIG_PCI</b>" = "y" ]; then
+  define_bool CONFIG_ACPI_PCI		y
+fi
+...
+endmenu
+
+mainmenu_option next_comment
+comment 'Bus options (PCI, PCMCIA, EISA, MCA, ISA)'
+   bool 'PCI support' <b>CONFIG_PCI</b>
+...
+endmenu
+</pre>
+
+
+<a name="forward-dependancy">
+<dt><b>forward-dependancy</b>
+<dd>
+A symbol was used as a dependency for a <span class="keyword">dep_bool</span>,
+<span class="keyword">dep_mbool</span> or
+<span class="keyword">dep_tristate</span> statement before it was declared.
+Note that this warning does not count symbols used as dependencies but never
+declared (see <a href="#undeclared-dependency">undeclared-dependency</a>).
+This indicates poor menu design which uses a symbol before it is declared
+elsewhere in the menu structure, thus making life difficult for users of
+<span class="code">make allyesconfig</span>.  For example,
+
+<pre class="example">
+# arch/mips/config.in
+source drivers/usb/Config.in
+source drivers/input/Config.in
+
+# drivers/usb/input/Config.in
+dep_tristate '  X-Box gamepad support' CONFIG_USB_XPAD $CONFIG_USB <b>$CONFIG_INPUT</b>
+
+# drivers/input/Config.in
+tristate 'Input core support' <b>CONFIG_INPUT</b>
+</pre>
+
+
+<a name="undeclared-dependancy">
+<dt><b>undeclared-dependancy</b>
+<dd>
+A symbol was used as a dependency for a <span class="keyword">dep_bool</span>,
+<span class="keyword">dep_mbool</span> or
+<span class="keyword">dep_tristate</span> statement but was never declared.
+Note that this warning does not count symbols used as dependencies and then
+later declared (see <a href="#forward-dependency">forward-dependency</a>).
+In single mode, this warning represents a dependency on a symbol not defined
+in the given architecture, which may be a logic error.  In merge mode, this
+warning represents a harmless and pointless fossil which has no effect on
+logic but wastes space in the corpus.  For example,
+
+<pre class="example">
+# most of the arches do this
+source drivers/ide/Config.in
+...
+tristate 'SCSI support' <b>CONFIG_SCSI</b>
+
+# drivers/ide/Config.in
+dep_tristate '    SCSI emulation support' CONFIG_BLK_DEV_IDESCSI ... <b>$CONFIG_SCSI</b>
+</pre>
+
+
+<a name="symbol-like-literal">
+<dt><b>symbol-like literal</b>
+<dd>
+A string literal looks suspiciously like it might have been intended
+to be a symbol reference, but the $ character was left off.  This
+may cause logic errors in all configurators.  For example,
+
+<pre class="example">
+if [ "<b>CONFIG_DECSTATION</b>" = "y" ]; then
+   ...
+fi
+</pre>
+
+
+<a name="constant-symbol-misuse">
+<dt><b>constant-symbol-misuse</b>
+<dd>
+A symbol which the parser considers to be a per-architecture constant
+(e.g. <span class="code">CONFIG_X86</span>) is declared in a strange
+way, e.g. as query rather than a define, or with a type other than bool,
+or defined to a value other than "y".  This is really just an internal
+consistency check for the parser.  This is not a real example:
+
+<pre class="example">
+# This never happens
+define_tristate CONFIG_X86 n
+</pre>
+
+
+<a name="constant-symbol-dependency">
+<dt><b>constant-symbol-dependency</b>
+<dd>
+A symbol which the parser considers to be a per-architecture constant
+(e.g. <span class="code">CONFIG_X86</span>) is used as a dependency in
+a <span class="keyword">dep_bool</span>, <span class="keyword">dep_mbool</span>,
+or <span class="keyword">dep_tristate</span> statement.  These symbols 
+have the property that their value is either empty or "y", neither of
+which values have an effect as a dependency.  So the usage is at best
+pointless and is probably not what the rule author intended.
+
+<pre class="example">
+# included from 10 arches which do not define CONFIG_X86
+dep_bool '  RZ1000 bugfix/support' CONFIG_BLK_DEV_RZ1000 <b>$CONFIG_X86</b>
+</pre>
+
+
+<a name="condition-loop">
+<dt><b>condition-loop</b>
+<dd>
+A symbol is defined inside an <span class="keyword">if</span> statement
+whose condition depends on the symbol.  This usually indicates a poorly
+designed menu structure which relies on the behaviour of
+<span class="code">config</span> and <span class="code">menuconfig</span>.
+For example:
+
+<pre class="example">
+if [ "$CONFIG_PCI" != "y" ]; then
+   define_bool CONFIG_PCI n
+fi
+</pre>
+
+<a name="dependency-loop">
+<dt><b>dependency-loop</b>
+<dd>
+A symbol has as a dependency itself or a symbol derived from itself.
+This is not a real example:
+
+<pre class="example">
+# Not a real example
+dep_bool CONFIG_FOO $CONFIG_FOO
+</pre>
+
+
+
+</dl>

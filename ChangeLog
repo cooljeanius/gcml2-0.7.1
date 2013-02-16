@@ -1,0 +1,443 @@
+Tue Sep 03 23:58:00 2002  Greg Banks <gnb@alphalink.com.au>
+	* Release 0.7.1
+
+	* Fixed memory corruption error where the banner node was being
+	  freed but not removed from the hashtable of all nodes.
+	* The CONFIG_DECSTATION bug in the mips port triggered an assert
+	  failure in the overlap code; this case is now handled more
+	  gracefully.
+	* Added two new warnings, condition-loop and dependency-loop.
+	* Gracefully handle case where a define_bool is conditional on itself.
+	* Some recursive expression functions now check for recursion loops
+	  and print an error message instead of blowing the stack.
+	* Fixed misfeature where failure to find a "source"d file would
+	  terminate parsing the remainder of the rulebase.
+	* Using a symbol name instead of a sub-prompt as the default
+	  value for a "choice" no longer causes a parse error.
+	* Plugged a number of memory leaks in the CML1 parser.
+	* Performance improvement for debug build; lots of spurious calls to
+	  expr_as_string() avoided.
+	* Added "save" debug keyword.
+	* Warning message for mixed overlaps includes the overlap type.
+	* Added some primitive memory-overrun debugging.
+	* Removed some small cruft.
+	* Library link order was broken.
+	* Makefiles allow building against specific glib, not just the one
+	  whose glib-config was found in $PATH.
+	* Location of the shell for shell scripts is discovered at build time.
+	* Added debugging and profiling support to cml-check-all shellscript.
+	* A cml-check profile build will record elapsed time for each run and
+	  save them to a file.
+	* Fixed some warnings found by non-gcc compilers.
+	* Replaced the variadic DDPRINTF() macro with a family of fixed
+	  macros to enable compilation on c89 compilers.
+
+Sun Aug 18 13:44:00 2002  Greg Banks <gnb@alphalink.com.au>
+    	* Release 0.7.
+
+	* Warnings can be individually enabled.  Default set depends on whether 
+	  the parser is in merge mode.  API functions to enable/disable
+	  warnings by index and convert a string name to an index.
+	* Added check for define to nonliteral expression.
+	* More precise check for ambiguous comparison against "n" only complains
+	  for symbols which are forward-declared at the point when compared.
+	* Made inconsistent-tag warnings more precise; doesn't emit spurious
+	  warnings about define_bool not having an (EXPERIMENTAL) tag.
+	* More precise check for forward references and forward dependencies can
+	  tell the difference between forward and undeclared, at the cost of
+	  some storage.
+	* Check for overlapping definitions by reducing conditions to
+	  disjunctive normal forms.
+	* Added check for forward dependencies.
+	* Added check for misuse of and dependency on arch-constant symbols
+	  like CONFIG_X86.
+	* Renamed summarise-warnings.awk -> summarize.awk and installed it.
+	* Added cml-summarize shell script, which runs summarize.awk.
+	* Added cml-check-all shell script, based on old dochecks.sh, but
+	  now also handles running cml-summarize.
+	* Added manpages for cml-check, cml-check-all and cml-summarize.
+	  Description of errors and warnings for the cml-check manpage is
+	  controlled in HTML and shared with the web page.
+	* RPM package support: added spec file, rpm: target.
+
+	* Added --version option to cml-check.
+	* Fixed some compiler warnings that only showed up when compiling
+	  with Mandrake's RPM_OPT_FLAGS.
+	* cml-check enters merge mode only if more than 1 filename given.
+	* Merged in TODO items from a separate TODO file that has been hanging
+	  around for some time.
+	* Centralised code for merging exprs to dependency rule exprs,
+	  visibility exprs, and saveability exprs.
+	* Allow enough room for state strings in node_gui_default_format_label.
+	* Removed the toggle controlling whether node warnings are shown, as
+	  that functionality has been merged into the state strings.
+	* Added WEAK_POSITION flag to allow a node to be moved from its first
+	  appearance in the tree as a define_bool to the expected place where it
+	  appears as a bool using mn_reparent().
+	* Separated out the calculation of branch treetype because it needs to
+	  be used again when checking for mixed overlaps.
+	* Reworked the code to merge the default exprs from various branches,
+	  to deal with cases brought out by mixed-overlap testing.
+	* TODO file lists specific tasks for bringing up to date with CML2
+	  1.9.5 language spec (as if this will ever happen).
+	* Cleaned up terminology: variable -> symbol.
+	* Added mn_reparent() for moving nodes around in the menu tree.
+	* There is now exactly one function to convert a branch type to a
+	  string.
+
+
+Tue Jul 23 00:15:00 2002  Greg Banks <gnb@alphalink.com.au>
+	* Release 0.6
+	* Main new feature is a new CML1 parser backend and a frontend
+	  which reads all 17 CML1 arch trees into a unified tree and
+	  does consistency checks.
+
+	* Added CML1 parser.  All filenames related to parsing and lexing are
+	  forked with CML1 and CML2 versions.
+	* Renamed cm2lib/ directory to libcml/.
+	* Renamed cml2lib.h to libcml.h.
+	* Renamed libcml2.a to libcml.a
+	* Renamed frontends from cml2-foo to cml-foo.
+	* Automatically detects whether a rulebase filename is CML1 or CML2
+	  and calls the appropriate parse routine.
+	* Implemented CML1 parser error recovery, and implemented explicit error
+	  messages for some errors, like unbalanced "endmenu".
+	* Added merge mode: multiple arch trees are read into the same rulebase
+	  and merged into a single tree, to find undefined symbols.
+	* Added frontend to use merge mode for global syntax check.
+	* Split parsing functionality of cml_rulebase_new() off into a new
+	  function cml_rulebase_parse().  This allows some actions to be
+	  taken between the creation and parsing, for example setting $ARCH.
+	* CML1 parser handles "choice" statement where the default does
+	  not match any of the sub-prompts.
+	* Added a new expression operator, E_MDEP, which supports the strange
+	  dependency semantics of the CML1 dep_mbool statement.
+	* For CML1 rulebases, the default value of symbols is now be an A_NONE
+	  atom instead of a zero-valued atom of the node's value_type.
+	* Perverted the expression semantics to allow atoms of type A_NONE
+	  to be used as valid values instead of being an internal failure mode.
+	* Save skips nodes with A_NONE values.
+	* Load and save routines handle the case where rb->prefix = NULL.
+	* CML1 parser reads and ignores the "unset" statement.
+	* To support the CML1 parser, children can be added to nodes one-by-one
+	  instead of just en-masse.
+	* Tweaked save routine to generate a defconfig file as close as possible
+	  to the CML1 parsers.
+	* cml1_parser.y:add_test() is only defined when it needs to be.
+	* Parse errors cause cml_rulebase_new() to fail, deleting the
+	  partially-loaded rulebase.
+	* Tweaked atom_type_as_string() to return strings as close as possible
+	  to the CML1 statements which result in symbols of those atom types,
+	  to reduce confusion in debugging and error messages.
+	* Rulebase post-parse checking separated into new postparse.c.
+	* Added node EXPERIMENTAL and OBSOLETE flags.  The equivalent branch
+	  flags are combined to set them.  Warnings issued if branches mismatch.
+	* CML1 parser detects the magic tags (EXPERIMENTAL) and (OBSOLETE) and
+	  confusing variants in banners and checks that they correspond
+	  to actual symbol dependency relationships.
+	* Added (DANGEROUS) as a variant form of (EXPERIMENTAL).
+	* CML1 parser handles various forms of hexadecimal literal for
+	  "define_hex" statement as well as "hex" statement.
+	* Added cml_node_is_new() which uses the MN_LOADED node flag to tell
+	  if a symbol has had a value loaded from a defconfig file.
+	* Replaced cml_node_get_warn_dependees() and cml_node_is_new() with
+	  cml_node_get_states() which calculates and returns an array of strings
+	  representing node states.
+	* Added cml_node_get_value_type() to get the symbol's value_type, which
+	  is needed now that the may not always be the right type.
+	* Jean-Luc Leger discovered a new class of CML1 error, where a quoted
+	  variable reference accidentally leaves out the $, becoming lexically
+	  a string literal.  Added a quick & dirty warning for that case.
+	* CML1 lexer emits warning when $ARCH is used.
+	* Made error and warning messages more consistent.
+	* Cleaned up CML1 parser branch data.  Necessary because the CML1 parser's
+	  use of node user_data confused the GTK frontend.
+	* CML1 lexer generates correct line numbers with multiline-prompts.
+	* CML1 lexer stores filenames in the cml_rulebase struct like the
+	  CML1 lexer.
+	* CML1 parser accurately reports location of previous definition of
+	  a node when it is redefined with a different banner.
+	* Added cml_rulebase_set_arch() to set the invisible, unsaveable $ARCH
+	  symbol for CML1.
+	* Added support for generating cross-reference information from CML1 parse.
+	  cml_rulebase_set_xref_filename() sets a filename to which xref records
+	  are written when variables are defined or used in Config.in files.
+	* Merging of "define_bool" and "bool" was broken; now handled with
+	  default expressions and saveability expressions rather than rules
+	  which could never be satisfied.
+	* Issue a warning when a query, choice or menu is defined in different
+	  places with different parents.
+	* Check for primitives, choices and comments in the top level menu and
+	  issue a warning.  Such constructs break xconfig.
+	* Branch was_banner field became a flag BR_WAS_BANNER.
+	* Compound nodes can be defined in different branches as different types,
+	  e.g. choice and menu.  This obviates the need for the "Processor Type"
+	  silly patches.
+	* Added branch flag BR_HAS_BANNER used by the magic tag check so that
+	  it doesn't spuriously report missing tags for define_bool statements.
+
+	* Added better debugging infrastructure.  A set of global debug flags
+	  can be set by frontends' option parsing for finegrain control of
+	  debug output when -DDEBUG.
+	* Added "lineno" debug token for debugging lexer line number accounting.
+	* Changed some DPRINTF()s to DDPRINTF()s to reduce stderr clutter.
+	* rb_dump_nodes() dumps node flags and traverses derived symbols.
+	* DDPRINTF() is defined both with and without -DDEBUG.
+	* Added prints of multiple branches for --debug=convert.
+	* Added window to curses frontend for running the rulebase test script
+	  and displaying the results.
+	* @assert failure message prints the expression.
+	* Added infrastructure for automating parse tests.
+	* Split test keyword @option into @commit and @freeze
+	* Added debug keyword "load" for debugging .config file loading.
+
+	* TODO file lists specific tasks for bringing up to date with CML2 1.9.5
+	  language spec.
+	* Added one of the newer CML2 features: the node "private" flag
+	  is replaced with a generic saveability expression.
+	* When no saveability expression is defined, the default is the
+	  visibility expression.  This moves the check down one level.
+	* Language spec update: only save format is defconfig
+	* Language spec update: `condition' statement may take a constant.
+	* Commented out forward declaration warning.
+
+	* Modified expr_as_string() to reduce the number of brackets emitted
+	  thus making debugging information a lot more readable.
+	* Rewrote expression simplification.  It now handles the cases where a
+	  logical operator has one atomic and one non-atomic operand and can
+	  be simplified to the non-atomic operand or its logical negation, e.g.
+	  anything or n = anything.
+	* Passing a NULL expr to expr_as_string() returns a new empty string
+	  instead of coredumping.  This made debugging code easier to write.
+	* Added expr_new_atom_from_string() to create an E_ATOM expression
+	  where the value is converted from a string representation.
+	* cml_atom_from_string() checks parsing of hex and int values.
+	* Added node CONSTANT flag, currently only set on $ARCH in single-arch
+	  mode.  Helps in expr simplification.
+	* cml_atom_from_string() has correct memory semantics for A_STRING.
+	* Fixed subtle bug in solver engine for case "foo <= bar, foo <= baz".
+	  Unfortunately this seems to have uncovered a bug in ESR's transaction
+	  design.
+	* expr_evaluate() handles a symbol having returning NULL from
+	  cml_node_get_value(), which can happen when rulebase nodes are
+	  dumped partway through a merge mode parse.
+	* A_NONE literals in expressions are printed as "null" rather than
+	  nothing, which makes reading some automatically generated
+	  expressions easier.
+	* Added expr_deep_copy() which does a deep clone of an expression.
+	* Added cml_atom_type_as_string(cml_atom*).
+
+	* Made _cml_tx_get() interface slightly cleaner.
+	* For some obscure reason I had deliberately coded so that first
+	  transaction could not be undone.  Removed this restriction.
+	* Added cml_rulebase_can_freeze() because now it's possible to have
+	  no transactions and hence nothing to freeze.
+
+	* Glass frontend can handle a node's banner being NULL.
+	* Glass frontend uses node's value_type for presentation purposes,
+	  not the type of it's current value.
+	* Curses frontend handles spaces in menu names (generated by the
+	  CML1 parser).
+	* If the rulebase load fails, the GTK frontend pops up the log window
+	  and an error notice but not the main window.
+	* Fixed curses presentation bugs.
+	* Fixed small presentation bug in glass frontend.
+	* Added an option to show node icons.
+	* Futzed about with freezing options.  Still not happy.
+	* Errors loading or saving defconfig files are reported in the GUI log.
+	* Better and more efficient formatting of error messages in the GUI log.
+	* Added View->Show Suppressed menu item.  Node status strings indicate
+	  whether the node is suppressed.
+
+	* Split off strvec data structure declarations into strvec.h
+	* Added verbose option to list which variables are affected by each
+	  error and warning, sorted in decreasing order of frequency.
+	* Fixed some formatting screwups.
+	* Fixed bugs which didn't trigger rules containing forward-declared
+	  symbols or derived symbols.
+	* branch_delete() cleans up the branch condition.
+	* Improved error checking for the "start" statement.
+	* Re-ordered calls to set_arch() and set_merge_mode() to deal with
+	  some bug I can't even remember.
+	* Tweaked error message for failure to load config file.
+	* Fixed slightly wrong comment about MN_LOADED flag.
+	* The common prefix of warning and error messages has fewer spaces.
+	  Filename and line number are checked for validity seperately.
+	* Improved checking for `condition' statement.
+
+	* Fixed bug where warnings about symbols redefined with different banners
+	  didn't specify locations properly if one of the definitions was in
+	  a "choices".
+	* Fixed subtle bug in solver engine for case "boolean <= tristate".
+	* Fixed bug which prevented bad rulebase parse from returning failure
+	  if the error message function was not default.
+	* Fixed bug which lost all values on load.
+	* Fixed bug in cond_else() which built incorrect conditions for
+	  the else-part of a conditional statement.
+	* Fixed bug where a boolean symbol with a default expression that
+	  returned {A_TRISTATE, CML_Y} lost its default value.
+	* Fixed bug which failed to clean up aborted transactions, causing a
+	  repeat attempt to coredump.
+	* Fixed bug which failed to strip (EXPERIMENTAL) tags from banners.
+	* Fixed bug which failed to detect dependency on CONFIG_EXPERIMENTAL
+	  if it occured in dep list of dep_bool et al.
+
+
+
+Mon Dec 10 09:50:31 2001  Greg Banks <gnb@alphalink.com.au>
+	* Release 0.5.1.
+	
+	* Added a TODO file.
+
+	* A node is suppressed if any of the nodes it depends on are also
+	suppressed.
+	* Fixed two format string bugs in test code.
+	
+	* Library error reporting functions are declared with the gcc "printf"
+	attribute to get format string checking.
+	* Automated test script for dependency visibility bug.
+	* Added Debug menu item to run automated test script.
+	* Added Debug menu entry for dumping node dependencies.
+	* Added Debug menu entry for dumping visibility expressions.
+
+Wed Dec  5 21:22:58 2001  Greg Banks <gnb@alphalink.com.au>
+
+	* Release 0.5.
+
+	* Changed licence from LGPL to GPL.
+
+	* First implementation of symbol dependence.
+	* Removed the "helpfile" declaration, relies on per-node inline help.
+	* Improved solver: now handles != < <= > >= for bool and tristate cases.
+	* cml_rulebase_commit() now returns a boolean indicating whether
+	it succeeded.
+	* Added external cml_rulebase_clear().
+
+	* Implemented curses UI using legacy kernel lxdialog; includes a
+	copy of the kernel's lxdialog source so gcml2 can build standalone.
+
+	* Implemented glass-tty interface.
+
+	* Implemented File->Save, File->Save As and File->Load properly,
+	with file selection dialogs and fallback from Save to Save As.
+	* Add About and Licence windows.
+	* Rejigged all dialogs to use GtkButtonBox for their buttons.
+	* Added Broken Rules window.
+	* Various code reorganisations.
+	* Added menu item to check all rules, without attempting to solve.
+	* Added infrastructure for automated test scripts.
+	* Added test scripts to a few of the test CML files.
+	* Added infrastructure for coverage testing with gcov.
+
+	* ChangeLog now in GNU format.
+	* Tarball now uses standard naming convention.
+	* GCML2 can be installed into e.g. /usr/local.
+	
+	* Fixed bug which generated bogus dependency rule for hexadecimal
+	symbols in a subtree guarded by a boolean.
+	* Work around libglade toolbar button relief bug.
+
+Sat May 12 12:00:00 2001  Greg Banks <gnb@alphalink.com.au>
+
+	* Release 0.4.
+	* First implementation of theorem solver.  Uses an inefficient two-pass
+	technique to make the code simpler.  Transactions which caused rules to
+	fail are automatically aborted.
+	* After discussions with ESR, changed defaults, derivations, and
+	visibility rules to delayed binding semantics.  This makes
+	everything a *lot* cleaner if slower.
+	* Changed transaction data structure to list bindings on nodes, so
+	the get operation is about 30 times more efficient.  This is probably
+	the last optimisation I'll need to make.
+	* Implemented trinary ?: as per ESR's BNF not my guess.
+	* Literal 'y' and 'n' have boolean type not tristate.
+	* Helpfile filename is relative to including file.
+	* Added Broken Rules window showing all the currently broken rules'
+	explanations in a scrolling list, using the rule's "explanation"
+	text if provided.
+	* Implemented inline helptext for nodes using "text" keyword.
+	* Integral type symbols may be subtree guards.
+	* Added '<' and '>' operators, inexplicably left out.
+	* Replaced "Node Help" menu item and tool with node help buttons.
+	* Sets main window title from rulebase "banner".  If none present,
+	uses CML filename.
+	* Sets main window icon from rulebase "icon".
+	* Added tooltips on node menu and help buttons.
+	* Added option to control whether changes are frozen.
+	* Added option to show nodes' frozen status in their labels.
+	* Node Help window is wider.
+	* Cleaned up some tooltips
+	* Implemented defconfig load and fixed defconfig save so
+	the cycle is clean.
+	* Defconfig save backs up file first.
+	* Save functions print the correct version number.
+	* External API cleanup.
+	* Added lexer test program.
+	* Added support for profiling.
+	* Only attempts to open helpfile once.  Nonce if its null.
+	* Used makedepend -Y to avoid cross-platform problems.
+	* Fixed bug in atom_compare.
+	* Fixed small bug in push_page().
+	* Fixed bugs in truth tables.
+	* Fixed presentation bug in the node warnings string.
+	* Fixed bug where frontend would crash on exit when the page
+	stack contains multiple pages.
+	* Fixed presentation bug where a menu containing only invisible
+	children would be confusingly presented with a label and no arrow.
+
+Sun Apr 22 12:00:00 2001  Greg Banks <gnb@alphalink.com.au>
+
+	* Release 0.3.
+	* Replaced tree representation of menus with pages in a notebook.  Best
+	feature of this is the absence of the separated value widgets; value
+	widgets are next to their labels at all times.
+	* Values are now stored in bindings, grouped into transactions,
+	which are logged.  Data structures are ESR's but enhanced
+	to allow for undo/redo.
+	* Added --stderr option to log to stderr as well as log window, so
+	can capture log messages if program dies prematurely.
+	* Added standard --help, --version commandline options.
+	* Implemented the trinary ?: operator.
+	* Implemented enums.
+	* Parses explanations, and attaches them to require rules.  Doesn't
+	actually use them yet.
+	* Parses `!' suffix for vital tristates into a flag on the node.
+	Visibility semantics are not implemented.
+	* Parses and ignores "condition nohelp".
+	* Handled the case where derived and query symbols' default values
+	depend on each other.
+	* The "private" keyword handles forward-declared symbols.
+	* Help window now uses click-on technique.
+	* Added a Debug menu.
+	* Added check for orphaned symbols and menus.
+	* Log window is hidden until popped up by an error.
+	* Reimplemented the "condition" keyword without using a rule type.
+	* Does not complain about the "banner" symbol not being used in a menu.
+	* Implemented the navigation items on the toolbar and View menu.
+	* Fixed minor bug with presentation of parse errors in log window.
+	* Fixed bug which gave a syntax error if the symbol-string pair
+	list for "menus", "symbols" or "explanations" was empty.
+	* Fixed a varargs bug which stuffed up yyerror().
+	* Fixed a bug which failed to set the default value of choices.
+	* Fixed some small gui bugs.
+	* Fixed bug which gave a syntax error if the last line in a file was
+	unterminated and a comment.  Ahh, emacs.
+
+Wed Mar 14 12:00:00 2001  Greg Banks <gnb@alphalink.com.au>
+
+	* Release 0.2.2.
+	* Added DEBUG define which turns on debugging prints.
+	* Debugging prints are almost all through new DPRINTF() macro.
+	* Created new common.h which has various common low-level things.
+	* Added CVSID() to all C source.
+	* Added proper error message callback mechanism.
+	* Renamed "OK" buttons "Close".
+	* Handles user closing dialogs with window manager.
+	* Added log window to GTK frontend.
+	* COPYING got left out of tarball.
+	* Uses makedepend's -Y flag
+  
+Tue Mar 13 12:00:00 2001  Greg Banks <gnb@alphalink.com.au>
+
+	* Release 0.2.1.
+	* first public release
