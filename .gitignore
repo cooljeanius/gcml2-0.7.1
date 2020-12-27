@@ -6,3 +6,6 @@
 stamp-h1
 libtool
 *.status
+Makefile
+gcml2.spec
+config.h
