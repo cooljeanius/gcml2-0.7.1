@@ -26,7 +26,11 @@ SUBDIRS=	libcml glass gtk curses check
 
 all-local depend install-local clean-local::
 	for d in $(SUBDIRS); do \
-	    (cd $${d}; $(MAKE) $@ ); \
+	  if test -d $${d} && test -r $${d}/Makefile; then \
+	    (pushd $${d}; $(MAKE) $@ || stat Makefile; popd); \
+	  else \
+	    echo "cannot make $@ in $${d}"; \
+	  fi; \
 	done
 
 #
@@ -51,7 +55,7 @@ my_distdir=	$(PACKAGE)-$(VERSION)
 DISTTAR=	$(PACKAGE)-$(VERSION).tar.gz
 MY_DISTFILES=	README Makefile variables.mk COPYING ChangeLog TODO \
 		gcml2.spec.in
-		
+DISTCLEANFILES= *~ autoscan.log build-aux/*~
 
 dist-hook:
 	$(RM) -r $(distdir)
@@ -91,5 +95,9 @@ rpm: dist-hook
 .PHONY: rpm
 
 clean-local::
-	$(RM) -r $(RPMDIR)
+	$(RM) -r $(RPMDIR) || rmdir $(RPMDIR)
 .PHONY: clean-local
+
+distclean-local::
+	$(RM) -r autom4te.cache || rmdir autom4te.cache
+.PHONY: distclean-local

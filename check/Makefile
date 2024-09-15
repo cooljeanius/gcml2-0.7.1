@@ -98,6 +98,13 @@ all:: $(SHELLSCRIPTS)
 clean::
 	$(RM) $(SHELLSCRIPTS)
 
+distclean::
+	$(RM) $(PROGRAM)
+.PHONY: distclean
+
+clean-local:
+.PHONY: clean-local
+
 install::
 	$(INSTALL) -m 755 $(SHELLSCRIPTS) $(bindir)
 	$(INSTALL) summarize.awk $(pkgdatadir)

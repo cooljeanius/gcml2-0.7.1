@@ -117,6 +117,13 @@ clean::
 	$(RM) cml1_lextest.o cml1_lextest cml1_lextokens.c
 	$(RM) cml2_lextest.o cml2_lextest cml2_lextokens.c
 
+distclean::
+	$(RM) $(LIBRARY)
+.PHONY: distclean
+
+clean-local:
+.PHONY: clean-local
+
 ############################################################
 
 DISTFILES=	Makefile \

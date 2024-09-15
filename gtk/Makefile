@@ -51,7 +51,14 @@ $(PROGRAM): $(OBJECTS) ../libcml/libcml.a
 
 clean::
 	$(RM) $(PROGRAM) $(OBJECTS)
-	
+
+distclean:: clean
+	which libglade-config || which imlib-config || which glib-config || which gtk-config || sync
+.PHONY: distclean
+
+clean-local:
+.PHONY: clean-local
+
 ifneq ($(GUI_DEBUG),)
     CPPFLAGS += -DDEBUG=$(GUI_DEBUG)
 endif

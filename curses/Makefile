@@ -70,6 +70,13 @@ clean::
 	$(RM) config.h config.sh config.mk
 	$(RM) -r include
 
+distclean::
+	$(RM) $(PROGRAM)
+.PHONY: distclean
+
+clean-local:
+.PHONY: clean-local
+
 ############################################################
 
 DISTFILES=	Makefile \

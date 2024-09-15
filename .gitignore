@@ -8,4 +8,10 @@ libtool
 *.status
 Makefile
 gcml2.spec
+confdefs.h
 config.h
+conftest*
+check/cml-check
+curses/cml-curses
+glass/cml-glass
+libcml/libcml.a

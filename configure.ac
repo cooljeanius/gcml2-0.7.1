@@ -16,20 +16,34 @@ AC_SEARCH_LIBS([strerror],[cposix])dnl
 
 # Checks for programs.
 if test "x${AWK}" = "x"; then
-  test -z "${AWK}"
+  test -z "${AWK}" || unset AWK
   AC_PROG_AWK
 else
   test -n "${AWK}" && export AWK
 fi
 AC_PROG_YACC
 if test "x${CC}" = "x"; then
-  test -z "${CC}"
+  test -z "${CC}" || unset CC
   AC_PROG_CC
 else
   test -n "${CC}" && export CC
 fi
 AC_PROG_CPP
-AC_PROG_GCC_TRADITIONAL
+if test "x${AR}" = "x"; then
+  test -z "${AR}" || unset AR
+  AC_CHECK_TOOLS([AR],[ar gar])dnl
+  ## might want to switch around these checks:
+  if test "x${ac_cv_prog_AR}" = "x"; then
+    test -z "${ac_cv_prog_AR}" || unset ac_cv_prog_AR
+    m4_ifdef([AC_PROG_AR],[
+      AC_PROG_AR
+    ],[
+      test -x "`which ar`" && echo "first ar in path is `which ar`"
+    ])
+  fi
+else
+  test -n "${AR}" && export AR
+fi
 AC_PROG_LEX
 AC_PROG_INSTALL
 AC_PROG_LN_S
@@ -71,7 +85,7 @@ dnl# ISO C90 headers unconditionally.
 # script's behavior did not change.  They are probably safe to remove.
 AC_CHECK_INCLUDES_DEFAULT
 if test "x${EGREP}" = "x"; then
-  test -z "${EGREP}"
+  test -z "${EGREP}" || unset EGREP
   AC_PROG_EGREP
 fi
 AC_HEADER_STDBOOL dnl# also "_CHECK"s it
@@ -81,15 +95,15 @@ AC_CHECK_HEADERS([fcntl.h gdk_imlib.h glade/glade.h glib.h glib/glib.h \
 AC_CHECK_HEADERS_ONCE([inttypes.h stdint.h stdlib.h string.h unistd.h])dnl
 
 if test "x${ac_cv_header_inttypes_h}" = "x"; then
-  test -z "${ac_cv_header_inttypes_h}"
+  test -z "${ac_cv_header_inttypes_h}" || unset ac_cv_header_inttypes_h
   AC_CHECK_HEADERS([inttypes.h])
 fi
 if test "x${ac_cv_header_stdint_h}" = "x"; then
-  test -z "${ac_cv_header_stdint_h}"
+  test -z "${ac_cv_header_stdint_h}" || unset ac_cv_header_stdint_h
   AC_CHECK_HEADERS([stdint.h])
 fi
 if test "x${ac_cv_header_unistd_h}" = "x"; then
-  test -z "${ac_cv_header_unistd_h}"
+  test -z "${ac_cv_header_unistd_h}" || unset ac_cv_header_unistd_h
   AC_CHECK_HEADERS([unistd.h])
 fi
 
